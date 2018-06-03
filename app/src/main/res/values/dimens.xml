@@ -6,4 +6,5 @@
 
     <dimen name="textsize_default">16sp</dimen>
     <dimen name="min_a11y_dimen">48dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

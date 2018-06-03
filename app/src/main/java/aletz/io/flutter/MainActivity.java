@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
+import android.view.Menu;
 
 import android.util.Log;
 import android.view.View;
@@ -184,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         buildGoogleApiClient();
     }
+
 
     /**
      * Builds {@link GoogleApiClient}, enabling automatic lifecycle management using
