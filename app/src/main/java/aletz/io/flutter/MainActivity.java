@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -31,6 +32,8 @@ import com.google.android.gms.nearby.messages.PublishOptions;
 import com.google.android.gms.nearby.messages.Strategy;
 import com.google.android.gms.nearby.messages.SubscribeCallback;
 import com.google.android.gms.nearby.messages.SubscribeOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,6 +187,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             nearbyDevicesListView.setAdapter(mNearbyDevicesArrayAdapter);
         }
         buildGoogleApiClient();
+
+        TextView mUid = (TextView) findViewById(R.id.account_id);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) mUid.setText(user.getEmail());
+
     }
 
 
