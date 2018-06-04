@@ -257,7 +257,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with better logic
-        return password != null && password != "" && password.length() > 4;
+        return password != null && password != "" && password.length() > 5;
     }
 
     /**

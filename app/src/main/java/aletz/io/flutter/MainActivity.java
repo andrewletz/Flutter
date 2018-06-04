@@ -1,6 +1,7 @@
 package aletz.io.flutter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -194,6 +195,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        startActivity(intent);
+    }
 
     /**
      * Builds {@link GoogleApiClient}, enabling automatic lifecycle management using
