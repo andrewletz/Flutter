@@ -40,6 +40,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
@@ -114,16 +117,6 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
     }
 
-    // TODO: remove if deemed unnecessary
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        updateUI(currentUser);
-//    }
-
     /**
      * Update UI based on user state
      */
@@ -162,8 +155,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Store values at the time of the register attempt.
         String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-        String name = mNameView.getText().toString();
+        final String password = mPasswordView.getText().toString();
+        final String name = mNameView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -193,6 +186,12 @@ public class RegisterActivity extends AppCompatActivity {
             cancel = true;
         }
 
+        if (name.length() > 40) {
+            mNameView.setError("This name is too long.");
+            focusView = mNameView;
+            cancel = true;
+        }
+
         if (cancel) {
             // There was an error; don't attempt register and focus the first
             // form field with an error.
@@ -206,21 +205,43 @@ public class RegisterActivity extends AppCompatActivity {
                     .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            // 1.5 second delay after making acc to make it seem like it's doing something
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // do nothing
-                                }
-                            }, 1500);
                             if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
+                                // Register success, update UI with the signed-in user's information
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                //TODO: set name here
+                                FlutterUser flutterUser = FlutterUser.newUser(user);
+                                flutterUser.setUsername(name);
                                 updateUI(user);
                             } else {
-                                // If sign in fails, display a message to the user
-                                updateUI(null);
+                                // If register fails, display a message to the user
+                                Toast toast;
+                                try
+                                {
+                                    throw task.getException();
+                                }
+                                // if user enters wrong email.
+                                catch (FirebaseAuthWeakPasswordException weakPassword)
+                                {
+                                    toast = Toast.makeText(getApplicationContext(), "Error: Password too weak.", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.TOP, 0, 0);
+                                    toast.show();
+                                }
+                                // if user enters wrong password.
+                                catch (FirebaseAuthInvalidCredentialsException malformedEmail)
+                                {
+                                    toast = Toast.makeText(getApplicationContext(), "Error: Malformed email.", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.TOP, 0, 0);
+                                    toast.show();
+                                }
+                                catch (FirebaseAuthUserCollisionException existEmail)
+                                {
+                                    toast = Toast.makeText(getApplicationContext(), "Error: email already exists.", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.TOP, 0, 0);
+                                    toast.show();
+                                }
+                                catch (Exception e)
+                                {
+                                    updateUI(null);
+                                }
                             }
                         }
                     });
