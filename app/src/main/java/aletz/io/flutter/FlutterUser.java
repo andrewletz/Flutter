@@ -11,6 +11,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
@@ -60,7 +62,10 @@ public class FlutterUser {
 
     private void setDefaults() {
         resetDatabaseReference();
-        UserInfo userInfo = new UserInfo("N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+        UserInfo userInfo = new UserInfo("N/A", "N/A", "N/A",
+                "https://firebasestorage.googleapis.com/v0/b/flutter-6ef7f.appspot.com/o/profile.jpg?alt=media&token=a4690bda-bd8b-4510-b991-160c79c201d3",
+                "N/A", "N/A");
+
         mDatabase.setValue(userInfo);
     }
 

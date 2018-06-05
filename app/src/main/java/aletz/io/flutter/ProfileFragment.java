@@ -1,18 +1,25 @@
 package aletz.io.flutter;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.io.InputStream;
 
 public class ProfileFragment extends Fragment {
 
@@ -24,6 +31,7 @@ public class ProfileFragment extends Fragment {
     private FlutterUser flutterUser;
 
     private TextView mUsername;
+    private ImageView mPhoto;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +57,15 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onCallback(UserInfo gotInfo) {
                 mUsername.setText(gotInfo.getUsername());
+            }
+        });
+
+        mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
+        flutterUser.readData(new FlutterUser.FirebaseCallback() {
+            @Override
+            public void onCallback(UserInfo gotInfo) {
+                new DownloadImageTask((ImageView) mPhoto)
+                        .execute("https://firebasestorage.googleapis.com/v0/b/flutter-6ef7f.appspot.com/o/profile.jpg?alt=media&token=a4690bda-bd8b-4510-b991-160c79c201d3");
             }
         });
 
@@ -80,6 +97,31 @@ public class ProfileFragment extends Fragment {
     private void gotoLogin() {
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 
 

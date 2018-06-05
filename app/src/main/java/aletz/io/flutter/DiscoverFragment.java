@@ -170,13 +170,6 @@ public class DiscoverFragment extends Fragment {
 
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        Intent intent = new Intent(Intent.ACTION_MAIN);
-//        intent.addCategory(Intent.CATEGORY_HOME);
-//        startActivity(intent);
-//    }
-
     /**
      * Subscribes to messages from nearby devices and updates the UI if the subscription either
      * fails or TTLs.
