@@ -18,21 +18,25 @@
             android:name="com.google.android.nearby.messages.API_KEY"
             android:value="AIzaSyA1_cN0GaKtqWT2LTfEV2rIxoWjHeFFIXc" />
 
-        <activity android:name=".MainActivity"
-            android:alwaysRetainTaskState="true"
-            android:exported="true"></activity>
         <activity
-            android:name=".LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".MainActivity"
+            android:alwaysRetainTaskState="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/title_activity_register"></activity>
+            android:label="@string/title_activity_register" />
     </application>
 
 </manifest>
