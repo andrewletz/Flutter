@@ -3,14 +3,18 @@ package aletz.io.flutter;
 public class UserInfo {
 
     private String bio;
+    private String email;
+    private String phone;
     private String photoURL;
     private String title;
     private String username;
 
     public UserInfo() {}
 
-    public UserInfo(String bio, String photoURL, String title, String username) {
+    public UserInfo(String bio, String email, String phone, String photoURL, String title, String username) {
         this.bio = bio;
+        this.email = email;
+        this.phone = phone;
         this.photoURL = photoURL;
         this.title = title;
         this.username = username;
@@ -48,4 +52,11 @@ public class UserInfo {
         this.username = username;
     }
 
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPhone() { return phone; }
+
+    public void setPhone(String phone) { this.phone = phone; }
 }

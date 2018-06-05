@@ -117,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
      * Switches to the main activity
      */
     private void gotoMain() {
-        Intent intent = new Intent(RegisterActivity.this, DiscoverFragment.class);
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
         startActivity(intent);
     }
 
@@ -133,7 +133,7 @@ public class RegisterActivity extends AppCompatActivity {
         mNameView.setError(null);
 
         // Store values at the time of the register attempt.
-        String email = mEmailView.getText().toString();
+        final String email = mEmailView.getText().toString();
         final String password = mPasswordView.getText().toString();
         final String name = mNameView.getText().toString();
 
@@ -189,6 +189,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 FlutterUser flutterUser = FlutterUser.newUser(user);
                                 flutterUser.setUsername(name);
+                                flutterUser.setUserEmail(email);
                                 updateUI(user);
                             } else {
                                 // If register fails, display a message to the user

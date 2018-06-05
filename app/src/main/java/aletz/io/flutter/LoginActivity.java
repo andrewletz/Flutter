@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
      * Switches to the main activity
      */
     private void gotoMain() {
-        Intent intent = new Intent(LoginActivity.this, DiscoverFragment.class);
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
     }
 

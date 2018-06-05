@@ -51,7 +51,10 @@ import java.util.UUID;
  */
 public class DiscoverFragment extends Fragment {
 
+    // for logging purposes
     private static final String TAG = DiscoverFragment.class.getSimpleName();
+
+    // for displaying on the UI tab
     public static final String TITLE = "Discover";
 
     // Key used in writing to and reading from SharedPreferences.

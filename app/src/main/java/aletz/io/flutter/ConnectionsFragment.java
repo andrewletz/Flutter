@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 public class ConnectionsFragment extends Fragment {
 
+    // for displaying on the UI tab
     public static final String TITLE = "Connections";
 
     @Nullable
