@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Flutter</string>
 
-    <string name="discover_nearby_devices">Discover nearby devices</string>
-    <string name="share_device_information">Share device information</string>
+    <string name="discover_nearby_devices">Discover</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

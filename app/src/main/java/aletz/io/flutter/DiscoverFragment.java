@@ -3,6 +3,8 @@ package aletz.io.flutter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,7 +41,9 @@ import com.google.android.gms.nearby.messages.SubscribeOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import java.util.UUID;
@@ -52,142 +57,128 @@ import java.util.UUID;
 public class DiscoverFragment extends Fragment {
 
     // for logging purposes
-    private static final String TAG = DiscoverFragment.class.getSimpleName();
+    private static final String TAG = "Discover";
 
-    // for displaying on the UI tab
+    // for displaying on the UI's tab
     public static final String TITLE = "Discover";
 
     // Key used in writing to and reading from SharedPreferences.
     private static final String KEY_UUID = "key_uuid";
 
-    /**
-     * Creates a UUID and saves it to {@link SharedPreferences}. The UUID is added to the published
-     * message to avoid it being undelivered due to de-duplication. See {@link DeviceMessage} for
-     * details.
-     */
-    private static String getUUID(SharedPreferences sharedPreferences) {
-        String uuid = sharedPreferences.getString(KEY_UUID, "");
-        if (TextUtils.isEmpty(uuid)) {
-            uuid = UUID.randomUUID().toString();
-            sharedPreferences.edit().putString(KEY_UUID, uuid).apply();
-        }
-        return uuid;
-    }
-
     // Views.
-    private SwitchCompat mPublishSwitch;
-    private SwitchCompat mSubscribeSwitch;
+    private SwitchCompat mDiscoverSwitch;
+
+    private FirebaseUser firebaseUser;
 
     // object used to broadcast information about the device to nearby devices.
     private Message mPubMessage;
     // for processing messages from nearby devices.
     private MessageListener mMessageListener;
-    //Adapter for working with messages from nearby publishers.
-    private ArrayAdapter<String> mNearbyDevicesArrayAdapter;
+    // Adapter for working with messages from nearby publishers.
+    private ConnectionRowAdapter mNearbyDevicesArrayAdapter;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    }
+
+    /** occurs after onCreate() is called, but before onActivityCreated */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_discover, container, false);
     }
 
-
+    /** after the Activity's onCreate() has been completed, and after onCreateView()
+        used for most logic as at this point we know we have a flutter user
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         View v = getView();
 
-        mSubscribeSwitch = (SwitchCompat) v.findViewById(R.id.subscribe_switch);
-        mPublishSwitch = (SwitchCompat) v.findViewById(R.id.publish_switch);
+        mDiscoverSwitch = (SwitchCompat) v.findViewById(R.id.discover_switch);
 
-        // Build the message that is going to be published. This contains the device name and a
-        // UUID.
-//        mPubMessage = DeviceMessage.newNearbyMessage(getUUID(getSharedPreferences(
-//                getApplicationContext().getPackageName(), Context.MODE_PRIVATE)));
-        mPubMessage = DeviceMessage.newNearbyMessage("Test");
+        // Build the message that is going to be published
+        mPubMessage = DeviceMessage.newNearbyMessage(this.firebaseUser.getUid());
+        Log.d(TAG, "mPubMessage is " + this.firebaseUser.getUid());
 
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(final Message message) {
                 // Called when a new message is found.
-                mNearbyDevicesArrayAdapter.add(
-                        DeviceMessage.fromNearbyMessage(message).getMessageBody());
+                FlutterUser user = FlutterUser.getUser(DeviceMessage.fromNearbyMessage(message).getUid());
+                Log.d(TAG, "message is " + DeviceMessage.fromNearbyMessage(message).getUid());
+                user.readData(new FlutterUser.FirebaseCallback() {
+                    @Override
+                    public void onCallback(UserInfo gotInfo) {
+                        mNearbyDevicesArrayAdapter.add(gotInfo);
+                    }
+                });
             }
 
             @Override
             public void onLost(final Message message) {
                 // Called when a message is no longer detectable nearby.
-                mNearbyDevicesArrayAdapter.remove(
-                        DeviceMessage.fromNearbyMessage(message).getMessageBody());
+                FlutterUser user = FlutterUser.getUser(DeviceMessage.fromNearbyMessage(message).getUid());
+                Log.d(TAG, "message is " + DeviceMessage.fromNearbyMessage(message).getUid());
+                user.readData(new FlutterUser.FirebaseCallback() {
+                    @Override
+                    public void onCallback(UserInfo gotInfo) {
+                        mNearbyDevicesArrayAdapter.remove(gotInfo);
+                    }
+                });
             }
         };
 
-        mSubscribeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mDiscoverSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // If GoogleApiClient is connected, perform sub actions in response to user action.
                 // If it isn't connected, do nothing, and perform sub actions when it connects (see
                 // onConnected()).
                 if (MainActivity.GoogleApiClient != null && MainActivity.GoogleApiClient.isConnected()) {
+                    mNearbyDevicesArrayAdapter.clear();
                     if (isChecked) {
                         subscribe();
-                    } else {
-                        unsubscribe();
-                    }
-                }
-            }
-        });
-
-        mPublishSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // If GoogleApiClient is connected, perform pub actions in response to user action.
-                // If it isn't connected, do nothing, and perform pub actions when it connects (see
-                // onConnected()).
-                if (MainActivity.GoogleApiClient != null && MainActivity.GoogleApiClient.isConnected()) {
-                    if (isChecked) {
                         publish();
                     } else {
+                        unsubscribe();
                         unpublish();
                     }
                 }
             }
         });
 
-        final List<String> nearbyDevicesArrayList = new ArrayList<>();
-        mNearbyDevicesArrayAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_list_item_1,
+        final ArrayList<UserInfo> nearbyDevicesArrayList = new ArrayList<>();
+        mNearbyDevicesArrayAdapter = new ConnectionRowAdapter(getActivity(),
                 nearbyDevicesArrayList);
+
         final ListView nearbyDevicesListView = (ListView) v.findViewById(
                 R.id.nearby_devices_list_view);
         if (nearbyDevicesListView != null) {
             nearbyDevicesListView.setAdapter(mNearbyDevicesArrayAdapter);
         }
 
-        TextView mUid = (TextView) v.findViewById(R.id.account_id);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) mUid.setText(user.getEmail());
+//        FlutterUser testUser = FlutterUser.getUser("wJwl98Q6YuWWBzbpFGrXny7jCHP2");
+//        for (int i = 0; i < 6; i ++) {
+//            testUser.readData(new FlutterUser.FirebaseCallback() {
+//                @Override
+//                public void onCallback(UserInfo gotInfo) {
+//                    mNearbyDevicesArrayAdapter.add(gotInfo);
+//                }
+//            });
+//        }
 
     }
 
     /**
-     * Subscribes to messages from nearby devices and updates the UI if the subscription either
-     * fails or TTLs.
+     * Subscribes to messages from nearby devices and updates the UI if the subscription fails
      */
     private void subscribe() {
         Log.i(TAG, "Subscribing");
-        mNearbyDevicesArrayAdapter.clear();
-        SubscribeOptions options = new SubscribeOptions.Builder()
-                .setCallback(new SubscribeCallback() {
-                    @Override
-                    public void onExpired() {
-                        super.onExpired();
-                        Log.i(TAG, "No longer subscribing");
-                        mSubscribeSwitch.setChecked(false);
-                    }
-                }).build();
-
-        Nearby.Messages.subscribe(MainActivity.GoogleApiClient, mMessageListener, options)
+        Nearby.Messages.subscribe(MainActivity.GoogleApiClient, mMessageListener)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
@@ -195,29 +186,18 @@ public class DiscoverFragment extends Fragment {
                             Log.i(TAG, "Subscribed successfully.");
                         } else {
                             logAndShowSnackbar("Could not subscribe, status = " + status);
-                            mSubscribeSwitch.setChecked(false);
+                            mDiscoverSwitch.setChecked(false);
                         }
                     }
                 });
     }
 
     /**
-     * Publishes a message to nearby devices and updates the UI if the publication either fails or
-     * TTLs.
+     * Publishes a message to nearby devices and updates the UI if the publication fails
      */
     private void publish() {
         Log.i(TAG, "Publishing");
-        PublishOptions options = new PublishOptions.Builder()
-                .setCallback(new PublishCallback() {
-                    @Override
-                    public void onExpired() {
-                        super.onExpired();
-                        Log.i(TAG, "No longer publishing");
-                        mPublishSwitch.setChecked(false);
-                    }
-                }).build();
-
-        Nearby.Messages.publish(MainActivity.GoogleApiClient, mPubMessage, options)
+        Nearby.Messages.publish(MainActivity.GoogleApiClient, mPubMessage)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
@@ -225,7 +205,7 @@ public class DiscoverFragment extends Fragment {
                             Log.i(TAG, "Published successfully.");
                         } else {
                             logAndShowSnackbar("Could not publish, status = " + status);
-                            mPublishSwitch.setChecked(false);
+                            mDiscoverSwitch.setChecked(false);
                         }
                     }
                 });
@@ -259,4 +239,49 @@ public class DiscoverFragment extends Fragment {
             Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
         }
     }
+
+    /**
+     * attribution: http://hmkcode.com/android-custom-listview-items-row/
+     * Used to create a custom listview for showing nearby people connected through Google nearby
+     */
+    public class ConnectionRowAdapter extends ArrayAdapter<UserInfo> {
+
+        private final Context context;
+        private final ArrayList<UserInfo> infoList;
+
+        private TextView mUsername;
+        private ImageView mPhoto;
+
+        public ConnectionRowAdapter(Context context, ArrayList<UserInfo> infoList) {
+            super(context, R.layout.listrow_connection, infoList);
+            this.context = context;
+            this.infoList = infoList;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            // Create inflater
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            // Get rowView from inflater
+            View v = inflater.inflate(R.layout.listrow_connection, parent, false);
+
+            // Get the two views
+            mUsername = (TextView) v.findViewById(R.id.username);
+            mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
+
+            // Set the appropriate information in views
+            mUsername = (TextView) v.findViewById(R.id.username);
+            mUsername.setText(infoList.get(position).getUsername());
+
+            mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
+            new DownloadImageTask((ImageView) mPhoto)
+                    .execute(infoList.get(position).getPhotoURL());
+
+            return v;
+        }
+    }
+
 }

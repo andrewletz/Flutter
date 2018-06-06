@@ -38,7 +38,7 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.mAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        this.flutterUser = FlutterUser.getUser(firebaseUser);
+        if (firebaseUser != null) this.flutterUser = FlutterUser.getUser(firebaseUser);
     }
 
     @Nullable
@@ -50,6 +50,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        if (flutterUser == null) return;
         View v = getView();
 
         mUsername = (TextView) v.findViewById(R.id.username);
@@ -98,31 +99,5 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
     }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
-
 
 }

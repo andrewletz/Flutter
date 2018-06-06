@@ -13,27 +13,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="aletz.io.flutter.DiscoverFragment">
 
-    <TextView
-        android:id="@+id/account_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/subscribe_switch"
+        android:id="@+id/discover_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/discover_nearby_devices" />
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/publish_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/share_device_information" />
-
     <ListView
         android:id="@+id/nearby_devices_list_view"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:transcriptMode="alwaysScroll" />
+
 </LinearLayout>

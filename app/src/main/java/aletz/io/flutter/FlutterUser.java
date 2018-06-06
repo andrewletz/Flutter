@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.firebase.FirebaseError;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -20,7 +21,7 @@ public class FlutterUser {
 
     final FirebaseDatabase database;
     private DatabaseReference mDatabase;
-    private FirebaseUser fUser;
+    private String uid;
     private UserInfo info;
     private String retString;
 
@@ -31,11 +32,22 @@ public class FlutterUser {
 
     public FlutterUser(FirebaseUser firebaseUser) {
         this.database = FirebaseDatabase.getInstance();
-        this.fUser = firebaseUser;
+        this.uid = firebaseUser.getUid();
+    }
+
+    public FlutterUser(String uid) {
+        this.database = FirebaseDatabase.getInstance();
+        this.uid = uid;
     }
 
     public static FlutterUser getUser(FirebaseUser firebaseUser) {
         FlutterUser user = new FlutterUser(firebaseUser);
+        user.getInfo();
+        return user;
+    }
+
+    public static FlutterUser getUser(String uid) {
+        FlutterUser user = new FlutterUser(uid);
         user.getInfo();
         return user;
     }
@@ -47,7 +59,7 @@ public class FlutterUser {
     }
 
     private void resetDatabaseReference() {
-        this.mDatabase = database.getReference().child("users").child("profile").child(fUser.getUid());
+        this.mDatabase = database.getReference().child("users").child("profile").child(uid);
     }
 
     private void getInfo() {
@@ -58,6 +70,10 @@ public class FlutterUser {
                 info = gotInfo;
             }
         });
+    }
+
+    public UserInfo getUserinfo() {
+        return this.info;
     }
 
     private void setDefaults() {

@@ -16,8 +16,7 @@ import java.nio.charset.Charset;
 public class DeviceMessage {
     private static final Gson gson = new Gson();
 
-    private final String mUUID;
-    private final String mMessageBody;
+    private final String uid;
 
     /**
      * Builds a new {@link Message} object using a unique identifier.
@@ -38,13 +37,11 @@ public class DeviceMessage {
                 DeviceMessage.class);
     }
 
-    private DeviceMessage(String uuid) {
-        mUUID = uuid;
-        mMessageBody = Build.MODEL;
-        // TODO(developer): add other fields that must be included in the Nearby Message payload.
+    private DeviceMessage(String uid) {
+        this.uid = uid;
     }
 
-    protected String getMessageBody() {
-        return mMessageBody;
+    protected String getUid() {
+        return uid;
     }
 }
