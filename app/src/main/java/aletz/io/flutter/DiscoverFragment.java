@@ -166,15 +166,15 @@ public class DiscoverFragment extends Fragment {
             nearbyDevicesListView.setAdapter(mNearbyDevicesArrayAdapter);
         }
 
-        FlutterUser testUser = FlutterUser.getUser("wJwl98Q6YuWWBzbpFGrXny7jCHP2");
-        for (int i = 0; i < 1; i ++) {
-            testUser.readData(new FlutterUser.FirebaseCallback() {
-                @Override
-                public void onCallback(UserInfo gotInfo) {
-                    mNearbyDevicesArrayAdapter.add(gotInfo);
-                }
-            });
-        }
+//        FlutterUser testUser = FlutterUser.getUser("wJwl98Q6YuWWBzbpFGrXny7jCHP2");
+//        for (int i = 0; i < 1; i ++) {
+//            testUser.readData(new FlutterUser.FirebaseCallback() {
+//                @Override
+//                public void onCallback(UserInfo gotInfo) {
+//                    mNearbyDevicesArrayAdapter.add(gotInfo);
+//                }
+//            });
+//        }
 
     }
 

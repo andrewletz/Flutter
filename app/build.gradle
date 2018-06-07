@@ -4,6 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "aletz.io.flutter"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
