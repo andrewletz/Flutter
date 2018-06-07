@@ -1,4 +1,9 @@
 package aletz.io.flutter;
+/**
+ * Credit to Google Nearby Android sample: https://github.com/googlesamples/android-nearby
+ * Created by Andrew Letz on 5-31-18
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.content.Context;
 import android.content.Intent;
@@ -161,15 +166,15 @@ public class DiscoverFragment extends Fragment {
             nearbyDevicesListView.setAdapter(mNearbyDevicesArrayAdapter);
         }
 
-//        FlutterUser testUser = FlutterUser.getUser("wJwl98Q6YuWWBzbpFGrXny7jCHP2");
-//        for (int i = 0; i < 6; i ++) {
-//            testUser.readData(new FlutterUser.FirebaseCallback() {
-//                @Override
-//                public void onCallback(UserInfo gotInfo) {
-//                    mNearbyDevicesArrayAdapter.add(gotInfo);
-//                }
-//            });
-//        }
+        FlutterUser testUser = FlutterUser.getUser("wJwl98Q6YuWWBzbpFGrXny7jCHP2");
+        for (int i = 0; i < 1; i ++) {
+            testUser.readData(new FlutterUser.FirebaseCallback() {
+                @Override
+                public void onCallback(UserInfo gotInfo) {
+                    mNearbyDevicesArrayAdapter.add(gotInfo);
+                }
+            });
+        }
 
     }
 

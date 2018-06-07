@@ -1,4 +1,9 @@
 package aletz.io.flutter;
+/**
+ * Some code taken from Google Nearby Android sample: https://github.com/googlesamples/android-nearby
+ * Created by Andrew Letz on 6-4-18
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -21,14 +26,16 @@ import com.google.android.gms.nearby.Nearby;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
 
+    // for debugging
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    // for fragment based tab UI layout
     private ViewPager mViewPager;
     private Toolbar mToolbar;
     private ViewPagerAdapter mViewPagerAdapter;
     private TabLayout mTabLayout;
-    // entry point to Google Play Services.
 
+    // entry point to Google Play Services.
     public static GoogleApiClient GoogleApiClient;
 
     @Override
@@ -36,16 +43,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // so the profile editing doesn't get pushed up the screen
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
+        // build our toolbar (disabled by default in the theme)
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+
         buildGoogleApiClient();
 
         setViewPager();
     }
 
+    /**
+     * used to build the custom tab layout using fragments
+     */
     private void setViewPager() {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());

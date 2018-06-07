@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Created by Andrew Letz on 6-4-18
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,10 +32,11 @@ public class ProfileFragment extends Fragment {
     // for displaying on the UI tab
     public static final String TITLE = "Profile";
 
+    // used for gathering/uploading info from/to Firebase database
     private FirebaseAuth mAuth;
-
     private FlutterUser flutterUser;
 
+    // ui references
     private TextView mUsername;
     private ImageView mPhoto;
 
@@ -44,6 +49,8 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mAuth = FirebaseAuth.getInstance();
+
+        // this shouldn't fail as the main activity is only loaded when there is already a firebase user logged in
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         if (firebaseUser != null) this.flutterUser = FlutterUser.getUser(firebaseUser);
     }
@@ -57,9 +64,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (flutterUser == null) return;
+        if (flutterUser == null) return; // check again in-case something is wrong
         View v = getView();
 
+        // gather all UI elements into their variables
         mUsername = (TextView) v.findViewById(R.id.username);
         mUsernameEdit = (EditText) v.findViewById(R.id.name);
         mBioEdit = (EditText) v.findViewById(R.id.bio);
@@ -67,6 +75,7 @@ public class ProfileFragment extends Fragment {
         mPhoneEdit = (EditText) v.findViewById(R.id.phone);
         mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
 
+        // read all current user data into each field
         flutterUser.readData(new FlutterUser.FirebaseCallback() {
             @Override
             public void onCallback(UserInfo gotInfo) {
@@ -78,6 +87,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // get the profile picture
         flutterUser.readData(new FlutterUser.FirebaseCallback() {
             @Override
             public void onCallback(UserInfo gotInfo) {
@@ -86,6 +96,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // set up update information and sign out buttons
         Button mUpdateButton = (Button) v.findViewById(R.id.update);
         Button mSignoutButton = (Button) v.findViewById(R.id.sign_out);
 
@@ -108,6 +119,10 @@ public class ProfileFragment extends Fragment {
 
     enum Action { SIGN_OUT, UPDATE_INFO }
 
+    /**
+     * creates a toast popup when the user presses one of the two buttons in this fragment
+     * @param action
+     */
     public void updateUI(Action action) {
         Toast toast;
 
@@ -128,6 +143,11 @@ public class ProfileFragment extends Fragment {
         toast.show();
     }
 
+    /**
+     * called when the user presses "update information" button
+     * updates all firebase info with the info the user put in the fields
+     * TODO: validate inputs
+     */
     public void updateDatabase() {
         flutterUser.setUserBio(mBioEdit.getText().toString());
         flutterUser.setUsername(mUsernameEdit.getText().toString());
@@ -135,7 +155,6 @@ public class ProfileFragment extends Fragment {
         flutterUser.setUserTitle(mTitleEdit.getText().toString());
         updateUI(Action.UPDATE_INFO);
     }
-
 
     /**
      * Signs the user out of their firebase account and redirects to login page

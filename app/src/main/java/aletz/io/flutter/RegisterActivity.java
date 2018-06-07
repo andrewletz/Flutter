@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Created by Andrew Letz on 6-1-18
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -30,13 +34,11 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via email/password and registration via an activity redirect
  */
 public class RegisterActivity extends AppCompatActivity {
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
+    // Keep track of the login task to ensure we can cancel it if requested.
     private FirebaseAuth mAuth;
 
     // UI references.

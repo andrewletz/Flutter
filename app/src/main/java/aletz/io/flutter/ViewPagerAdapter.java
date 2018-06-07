@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Created by Andrew Letz on 6-4-18
+ * Last modified by Andrew Letz on 6-4-18
+ */
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +13,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     private static int TAB_COUNT = 3;
 
+    /**
+     * Used to create the custom fragment tab layout
+     * See FragmentStatePagerAdapter for more info on function purpose
+     * @param fm
+     */
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }

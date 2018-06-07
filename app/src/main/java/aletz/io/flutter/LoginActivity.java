@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Created by Andrew Letz on 6-1-18
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -37,18 +41,21 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
 
+    // for performing database auth tasks
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseAuth.getInstance().signOut(); // TODO: Remove this
         setContentView(R.layout.activity_login);
 
-        // Set up the login form.
+        // get UI elements
         mEmailView = (EditText) findViewById(R.id.email);
-
         mPasswordView = (EditText) findViewById(R.id.password);
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+
+        // set up password listener for logging in on return
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -60,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        // set up listener for sign in button to attempt login
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        // set up listener for register button to go to register activity
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

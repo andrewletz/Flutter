@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Credit to Google Nearby Android sample: https://github.com/googlesamples/android-nearby
+ * Last modified by Andrew Letz on 6-6-18
+ */
 
 import android.os.Build;
 

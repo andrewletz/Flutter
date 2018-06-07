@@ -1,4 +1,9 @@
 package aletz.io.flutter;
+/**
+ * Credit to https://stackoverflow.com/questions/3090650/android-loading-an-image-from-the-web-with-asynctask
+ * Created on 6-4-18
+ * Last modified by Andrew Letz on 6-4-18
+ */
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +13,9 @@ import android.widget.ImageView;
 
 import java.io.InputStream;
 
+/**
+ * Used to download an image from a URL and insert it into an ImageView
+ */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
 

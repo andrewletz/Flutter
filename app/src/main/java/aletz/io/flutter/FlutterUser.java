@@ -1,4 +1,8 @@
 package aletz.io.flutter;
+/**
+ * Created by Andrew Letz on 6-3-18
+ * Last modified by Andrew Letz on 6-4-18
+ */
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -17,14 +21,21 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
+/**
+ * Class used to more easily interact with the Firebase database
+ */
 public class FlutterUser {
 
     final FirebaseDatabase database;
     private DatabaseReference mDatabase;
-    private String uid;
-    private UserInfo info;
-    private String retString;
 
+    // reference to the Firebase users uid
+    private String uid;
+
+    // stores all info for the Flutter user in the database
+    private UserInfo info;
+
+    // used for debugging purposes
     private String TAG = "FlutterUser";
 
     // Used for getting data from firebase
@@ -40,28 +51,51 @@ public class FlutterUser {
         this.uid = uid;
     }
 
+    /**
+     * Gets an already existing user with a FirebaseUser reference
+     * @param firebaseUser
+     * @return appropriate FlutterUser
+     */
     public static FlutterUser getUser(FirebaseUser firebaseUser) {
         FlutterUser user = new FlutterUser(firebaseUser);
         user.getInfo();
         return user;
     }
 
+    /**
+     * Gets an already existing user with a uid
+     * @param uid
+     * @return appropriate FlutterUser
+     */
     public static FlutterUser getUser(String uid) {
         FlutterUser user = new FlutterUser(uid);
         user.getInfo();
         return user;
     }
 
+    /**
+     * Creates a new FlutterUser with appropriate FirebaseUser.
+     * Used on registration activity to load in default values into realtime database.
+     * Should not be used to get a new instance of an already existing Flutter user.
+     * @param firebaseUser
+     * @return appropriate FlutterUser
+     */
     public static FlutterUser newUser(FirebaseUser firebaseUser) {
         FlutterUser user = new FlutterUser(firebaseUser);
         user.setDefaults();
         return user;
     }
 
+    /**
+     * returns the database reference to the head of the users information
+     */
     private void resetDatabaseReference() {
         this.mDatabase = database.getReference().child("users").child("profile").child(uid);
     }
 
+    /**
+     * refreshes a FlutterUsers UserInfo variable with current information from database
+     */
     private void getInfo() {
         resetDatabaseReference();
         readData(new FirebaseCallback() {
@@ -76,6 +110,9 @@ public class FlutterUser {
         return this.info;
     }
 
+    /**
+     * Used on registration activity to load in default values into realtime database
+     */
     private void setDefaults() {
         resetDatabaseReference();
         UserInfo userInfo = new UserInfo("N/A", "N/A", "N/A",
@@ -121,6 +158,11 @@ public class FlutterUser {
         this.mDatabase.setValue(username);
     }
 
+    /**
+     * Asynchronous retrieving of data from the Firebase database
+     * Needs a new FirebaseCallback passed in so it can pass back the gathered info
+     * @param firebaseCallback
+     */
     public void readData(final FirebaseCallback firebaseCallback) {
         resetDatabaseReference();
 
