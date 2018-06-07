@@ -12,6 +12,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +34,11 @@ public class ProfileFragment extends Fragment {
 
     private TextView mUsername;
     private ImageView mPhoto;
+
+    private EditText mUsernameEdit;
+    private EditText mTitleEdit;
+    private EditText mBioEdit;
+    private EditText mPhoneEdit;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,14 +61,23 @@ public class ProfileFragment extends Fragment {
         View v = getView();
 
         mUsername = (TextView) v.findViewById(R.id.username);
+        mUsernameEdit = (EditText) v.findViewById(R.id.name);
+        mBioEdit = (EditText) v.findViewById(R.id.bio);
+        mTitleEdit = (EditText) v.findViewById(R.id.title);
+        mPhoneEdit = (EditText) v.findViewById(R.id.phone);
+        mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
+
         flutterUser.readData(new FlutterUser.FirebaseCallback() {
             @Override
             public void onCallback(UserInfo gotInfo) {
                 mUsername.setText(gotInfo.getUsername());
+                mUsernameEdit.setText(gotInfo.getUsername());
+                mBioEdit.setText(gotInfo.getBio() != "N/A" ? gotInfo.getBio() : "");
+                mTitleEdit.setText(gotInfo.getTitle() != "N/A" ? gotInfo.getTitle() : "");
+                mPhoneEdit.setText(gotInfo.getPhone() != "N/A" ? gotInfo.getPhone() : "");
             }
         });
 
-        mPhoto = (ImageView) v.findViewById(R.id.profilePicture);
         flutterUser.readData(new FlutterUser.FirebaseCallback() {
             @Override
             public void onCallback(UserInfo gotInfo) {
@@ -70,24 +86,62 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        Button mUpdateButton = (Button) v.findViewById(R.id.update);
+        Button mSignoutButton = (Button) v.findViewById(R.id.sign_out);
+
+        mUpdateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateDatabase();
+            }
+        });
+
+        mSignoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signOut();
+            }
+        });
+
 
     }
 
-    public void updateUI() {
+    enum Action { SIGN_OUT, UPDATE_INFO }
+
+    public void updateUI(Action action) {
         Toast toast;
-        if (this.flutterUser != null) {
-            toast = Toast.makeText(getActivity(), "Updated UI", Toast.LENGTH_SHORT);
-        } else {
-            toast = Toast.makeText(getActivity(), "User is null", Toast.LENGTH_SHORT);
+
+        switch (action) {
+            case SIGN_OUT:
+                toast = Toast.makeText(getActivity(), "Signed out.", Toast.LENGTH_SHORT);
+                break;
+
+            case UPDATE_INFO:
+                toast = Toast.makeText(getActivity(), "Updated information.", Toast.LENGTH_SHORT);
+                break;
+
+            default:
+                toast = Toast.makeText(getActivity(), "Error in updateUI.", Toast.LENGTH_SHORT);
         }
+
         toast.setGravity(Gravity.TOP, 0, 0);
         toast.show();
     }
+
+    public void updateDatabase() {
+        flutterUser.setUserBio(mBioEdit.getText().toString());
+        flutterUser.setUsername(mUsernameEdit.getText().toString());
+        flutterUser.setUserPhone(mPhoneEdit.getText().toString());
+        flutterUser.setUserTitle(mTitleEdit.getText().toString());
+        updateUI(Action.UPDATE_INFO);
+    }
+
 
     /**
      * Signs the user out of their firebase account and redirects to login page
      */
     private void signOut() {
+        updateUI(Action.SIGN_OUT);
         mAuth.signOut();
         gotoLogin();
     }
